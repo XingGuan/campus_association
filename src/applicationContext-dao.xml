@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+		<!-- 引入外部属性文件 -->
+	<context:component-scan base-package="ccu.campus.association.dao"></context:component-scan>
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	<!-- 配置数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+              <!-- 数据源驱动类可不写，Druid默认会自动根据URL识别DriverClass -->
+		<property name="driverClassName" value="${jdbc.driver}" />
+
+		<!-- 基本属性 url、user、password -->
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="3" />
+		<property name="minIdle" value="3" />
+		<property name="maxActive" value="20" />
+        </bean> 
+    <bean id="sessionFactory"  
+            class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">  
+            <property name="dataSource">  
+                <ref bean="dataSource" />  
+            </property>  
+            <property name="hibernateProperties">  
+                <props>  
+                	<prop key="hibernate.connection.release_mode">
+ 					 after_transaction
+					</prop>
+                    <prop key="hibernate.dialect">  
+                        org.hibernate.dialect.MySQLDialect  
+                    </prop>  
+                    <prop key="hibernate.hbm2ddl.auto">update</prop>  
+                    <prop key="hibernate.show_sql">true</prop>  
+                </props>  
+            </property>  
+        <!-- 配置hibernateTemplate 相当于jdbc  -->
+      
+            <property name="mappingResources">  
+                <list>  
+                    <value>ccu/campus/association/pojo/User.hbm.xml</value>  
+                </list>  
+            </property>  
+    </bean>  
+     <bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"></property>  <!-- 注入sessionFactory -->
+    </bean>    
+</beans>
